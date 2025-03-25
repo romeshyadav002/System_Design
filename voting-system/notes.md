@@ -10,6 +10,78 @@ VotingSystem/
     ├── DataStore.java
     └── Main.java
 
+classDiagram
+    class Voter {
+        - voterId : String
+        - name : String
+        - votedElections : Set<String>
+        + Voter(voterId: String, name: String)
+        + hasVoted(electionId: String) : boolean
+        + addVotedElection(electionId: String) : void
+    }
+    class Admin {
+        - adminId : String
+        - name : String
+        + Admin(adminId: String, name: String)
+    }
+    class Election {
+        - electionId : String
+        - title : String
+        - startDate : Date
+        - endDate : Date
+        - candidates : List<Candidate>
+        - isActive : boolean
+        + Election(electionId: String, title: String, startDate: Date, endDate: Date, candidates: List<Candidate>)
+        + isActive() : boolean
+    }
+    class Candidate {
+        - candidateId : String
+        - name : String
+        + Candidate(candidateId: String, name: String)
+    }
+    class Vote {
+        - voteId : String
+        - voterId : String
+        - electionId : String
+        - candidateId : String
+        + Vote(voteId: String, voterId: String, electionId: String, candidateId: String)
+    }
+    class ElectionService {
+        - dataStore : DataStore
+        + ElectionService(dataStore: DataStore)
+        + createElection(admin: Admin, election: Election) : void
+        + activateElection(admin: Admin, electionId: String) : void
+        + deactivateElection(admin: Admin, electionId: String) : void
+        + getElectionResults(electionId: String) : Map<Candidate, Integer>
+    }
+    class VoterService {
+        - dataStore : DataStore
+        - electionService : ElectionService
+        + VoterService(dataStore: DataStore, electionService: ElectionService)
+        + registerVoter(voter: Voter) : void
+        + castVote(voter: Voter, vote: Vote) : void
+        + getActiveElections() : List<Election>
+    }
+    class DataStore {
+        - voters : Map<String, Voter>
+        - elections : Map<String, Election>
+        - votes : List<Vote>
+        + saveVoter(voter: Voter) : void
+        + getVoter(voterId: String) : Voter
+        + saveElection(election: Election) : void
+        + getElection(electionId: String) : Election
+        + saveVote(vote: Vote) : void
+        + getVotes(electionId: String) : List<Vote>
+        + getAllElections() : List<Election>
+    }
+
+    ElectionService --> DataStore : uses
+    VoterService --> DataStore : uses
+    VoterService --> ElectionService : uses
+    Election --> Candidate : contains
+    Vote --> Voter : associated with
+    Vote --> Election : associated with
+    Vote --> Candidate : associated with
 
 Let's break down the role of each class in the voting system and how they interact:
 
